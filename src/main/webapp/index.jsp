@@ -2,6 +2,6 @@
 <html>
 <body>
 
-<h2>This is Dev branch PSD DEVOPS . . . </h2>
+<h2>This is Dev branch...Deployed just now </h2>
 </body>
 </html>
