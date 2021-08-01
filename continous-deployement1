@@ -1,0 +1,35 @@
+pipeline{
+ agent any 
+  parameters {
+  string(name: 'name', defaultValue: '',, description: 'Select the name ', trim: true)
+  string(name: 'environment', defaultValue: '',, description: 'Select the environment')
+  string(name: 'Deploy', defaultValue: '', description: 'select the deploy')
+} 
+stages{
+   stage("deployement"){
+    steps{
+     //sshagent(['tomcat-cred']) {
+    echo 'Deployement started'
+    //echo "${params.(params.environment)}"
+	 sh "ssh root@18.216.137.255 /root/tomcat/bin/shutdown.sh"
+	 sh "scp -o StrictHostKeyChecking=yes /var/lib/jenkins/workspace/continous-integration1/target/*.war root@18.216.137.255:/root/tomcat/webapps"
+     sh "ssh root@18.216.137.255 /root/tomcat/bin/startup.sh"
+	echo 'Deployement completed'
+  //}
+    }
+  post {
+   success{
+    mail to: 'naveentanish2@gmail.com',
+    subject: "Job completed find the build_url '${JOB_NAME}' (${BUILD_NUMBER})",
+    body: "Please go to ${BUILD_URL} and verify the build is completed"
+        }
+   failure{
+    mail to: 'naveentanish2@gmail.com',
+    subject: "Job failed find the build_url '${JOB_NAME}' (${BUILD_NUMBER})",
+    body: "Please go to ${BUILD_URL} and verify the build is failure"
+         }
+       }
+     }
+   }
+ }
+

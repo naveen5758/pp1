@@ -1,0 +1,50 @@
+pipeline{
+agent any
+  parameters {
+  string defaultValue: 'master', description: 'Select the name ', name: 'name ', trim: true
+  choice choices: ['master', 'dev', 'Prod'], description: 'Select the environment', name: 'environment'
+  booleanParam defaultValue: true, description: 'select the deploy', name: 'Deploy'
+}
+stages{
+  stage("SCM"){
+   steps{
+    script{
+    echo 'cloning started'
+	git branch: '$environment ', credentialsId: 'e5cb736b-5323-41d7-a167-370721d1a06d', url: 'https://github.com/naveen5758/pp1.git'
+	echo 'clone is completed'
+	}
+   }
+  }
+ 
+ stage("Nexus"){
+   steps{
+    script{
+    echo 'nexus started'
+	 sh 'mvn clean package'
+	 //echo "${params.environment}"
+	echo 'nexus is completed'
+	}
+   }
+  }
+ 
+stage("Build"){
+   steps{
+    script{
+    echo 'Build started'
+	 sh 'mvn clean package'
+	 echo "${params.environment}"
+	echo 'Build is completed'
+	}
+   }
+  }
+stage("calling_continous-deployement1"){
+  steps{
+           echo 'calling started'
+           build(job: 'continous-deployement1', parameters: [string(name: 'name', value:'${name}'),
+           string(name: 'environment', value:'${environment}'),
+           string(name: 'Deploy', value:'${Deploy}')
+		   ])
+       }
+  }		   
+ }
+}
